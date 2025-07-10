@@ -47,6 +47,9 @@ import org.apache.ibatis.session.SqlSession;
 public class MapperMethod {
 
   private final SqlCommand command;
+  /**
+   * Mapper 接口中方法的相关信息
+   */
   private final MethodSignature method;
 
   public MapperMethod(Class<?> mapperInterface, Method method, Configuration config) {
@@ -217,8 +220,9 @@ public class MapperMethod {
   }
 
   public static class SqlCommand {
-
+    // 记录了关联 SQL 语句的唯一标识
     private final String name;
+    // 维护了 SQL 语句的操作类型
     private final SqlCommandType type;
 
     public SqlCommand(Configuration configuration, Class<?> mapperInterface, Method method) {
@@ -274,6 +278,9 @@ public class MapperMethod {
 
   public static class MethodSignature {
 
+    /**
+     * 返回值
+     */
     private final boolean returnsMany;
     private final boolean returnsMap;
     private final boolean returnsVoid;
@@ -281,7 +288,13 @@ public class MapperMethod {
     private final boolean returnsOptional;
     private final Class<?> returnType;
     private final String mapKey;
+    /**
+     * 记录了 Mapper 接口方法的参数列表中 ResultHandler 类型参数的位置。
+     */
     private final Integer resultHandlerIndex;
+    /**
+     * 记录了 Mapper 接口方法的参数列表中 RowBounds 类型参数的位置
+     */
     private final Integer rowBoundsIndex;
     private final ParamNameResolver paramNameResolver;
 

@@ -375,10 +375,13 @@ public class PooledDataSource implements DataSource {
   protected void pushConnection(PooledConnection conn) throws SQLException {
 
     synchronized (state) {
+      // 从活跃连接集合中移除
       state.activeConnections.remove(conn);
       if (conn.isValid()) {
+        // 空闲连接数还没有到达最大值
         if (state.idleConnections.size() < poolMaximumIdleConnections && conn.getConnectionTypeCode() == expectedConnectionTypeCode) {
           state.accumulatedCheckoutTime += conn.getCheckoutTime();
+          // 回滚未提交的事物
           if (!conn.getRealConnection().getAutoCommit()) {
             conn.getRealConnection().rollback();
           }
@@ -396,6 +399,7 @@ public class PooledDataSource implements DataSource {
           if (!conn.getRealConnection().getAutoCommit()) {
             conn.getRealConnection().rollback();
           }
+          // 空闲连接数已经满了 直接关闭掉connection
           conn.getRealConnection().close();
           if (log.isDebugEnabled()) {
             log.debug("Closed connection " + conn.getRealHashCode() + ".");
@@ -421,6 +425,7 @@ public class PooledDataSource implements DataSource {
       synchronized (state) {
         if (!state.idleConnections.isEmpty()) {
           // Pool has available connection
+          // 尝试从空闲连接吃获取连接
           conn = state.idleConnections.remove(0);
           if (log.isDebugEnabled()) {
             log.debug("Checked out connection " + conn.getRealHashCode() + " from pool.");
@@ -536,6 +541,7 @@ public class PooledDataSource implements DataSource {
     boolean result = true;
 
     try {
+      // 检测底层数据库连接是否已经关闭
       result = !conn.getRealConnection().isClosed();
     } catch (SQLException e) {
       if (log.isDebugEnabled()) {
@@ -543,7 +549,10 @@ public class PooledDataSource implements DataSource {
       }
       result = false;
     }
-
+    // 如果底层与数据库的网络连接没断开，则需要检测poolPingEnabled字段的配置，决定
+    // 是否能执行ping操作。另外，ping操作不能频繁执行，只有超过一定时长
+    // (超过poolPingConnectionsNotUsedFor指定的时长)未使用的连接，才需要ping
+    // 操作来检测数据库连接是否正常
     if (result && poolPingEnabled && poolPingConnectionsNotUsedFor >= 0
         && conn.getTimeElapsedSinceLastUse() > poolPingConnectionsNotUsedFor) {
       try {

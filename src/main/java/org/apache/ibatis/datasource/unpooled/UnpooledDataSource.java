@@ -37,7 +37,9 @@ import org.apache.ibatis.io.Resources;
  * @author Eduardo Macarron
  */
 public class UnpooledDataSource implements DataSource {
-
+  /**
+   * 加载 Driver 类的类加载器
+   */
   private ClassLoader driverClassLoader;
   private Properties driverProperties;
   private static Map<String, Driver> registeredDrivers = new ConcurrentHashMap<>();
@@ -220,8 +222,11 @@ public class UnpooledDataSource implements DataSource {
   }
 
   private Connection doGetConnection(Properties properties) throws SQLException {
+    // 初始化数据库驱动
     initializeDriver();
+    // 创建数据库连接
     Connection connection = DriverManager.getConnection(url, properties);
+    // 配置数据库连接
     configureConnection(connection);
     return connection;
   }
@@ -246,6 +251,10 @@ public class UnpooledDataSource implements DataSource {
     }
   }
 
+  /**
+   * 对数据库连接进行一系列配置，例如，数据库连接超时时长、事务是否自动提交以及使用的事务隔离级别。
+   * @param conn
+   */
   private void configureConnection(Connection conn) throws SQLException {
     if (defaultNetworkTimeout != null) {
       conn.setNetworkTimeout(Executors.newSingleThreadExecutor(), defaultNetworkTimeout);

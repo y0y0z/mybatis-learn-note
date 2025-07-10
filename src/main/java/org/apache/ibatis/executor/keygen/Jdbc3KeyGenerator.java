@@ -82,6 +82,7 @@ public class Jdbc3KeyGenerator implements KeyGenerator {
       if (rsmd.getColumnCount() < keyProperties.length) {
         // Error?
       } else {
+        // 处理rs这个结果集，将生成的id设置到对应的属性中
         assignKeys(configuration, rs, rsmd, keyProperties, parameter);
       }
     } catch (Exception e) {

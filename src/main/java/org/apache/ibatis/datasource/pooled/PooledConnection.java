@@ -32,12 +32,18 @@ class PooledConnection implements InvocationHandler {
   private static final Class<?>[] IFACES = new Class<?>[] { Connection.class };
 
   private final int hashCode;
+  /**
+   * 记录当前 PooledConnection 对象归属的 PooledDataSource 对象
+   */
   private final PooledDataSource dataSource;
   private final Connection realConnection;
   private final Connection proxyConnection;
   private long checkoutTimestamp;
   private long createdTimestamp;
   private long lastUsedTimestamp;
+  /**
+   * 数据库连接的标识。该标识是由数据库 URL、username 和 password 三部分组合计算出来的 hash 值，主要用于连接对象确认归属的连接池
+   */
   private int connectionTypeCode;
   private boolean valid;
 
@@ -243,6 +249,7 @@ class PooledConnection implements InvocationHandler {
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
     String methodName = method.getName();
     if (CLOSE.equals(methodName)) {
+      // 如果调用close()方法，并没有直接关闭底层连接，而是将其归还给关联的连接池
       dataSource.pushConnection(this);
       return null;
     }

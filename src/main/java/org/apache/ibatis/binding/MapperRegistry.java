@@ -32,8 +32,13 @@ import org.apache.ibatis.session.SqlSession;
  * @author Lasse Voss
  */
 public class MapperRegistry {
-
+  /**
+   * MyBatis 全局唯一的 Configuration 对象
+   */
   private final Configuration config;
+  /**
+   * 所有解析到的 Mapper 接口以及 MapperProxyFactory 工厂对象之间的映射关系
+   */
   private final Map<Class<?>, MapperProxyFactory<?>> knownMappers = new HashMap<>();
 
   public MapperRegistry(Configuration config) {
@@ -42,6 +47,7 @@ public class MapperRegistry {
 
   @SuppressWarnings("unchecked")
   public <T> T getMapper(Class<T> type, SqlSession sqlSession) {
+    // 拿到type对应的工厂
     final MapperProxyFactory<T> mapperProxyFactory = (MapperProxyFactory<T>) knownMappers.get(type);
     if (mapperProxyFactory == null) {
       throw new BindingException("Type " + type + " is not known to the MapperRegistry.");
@@ -58,7 +64,9 @@ public class MapperRegistry {
   }
 
   public <T> void addMapper(Class<T> type) {
+    // 确保type是个接口
     if (type.isInterface()) {
+      // 确保knownMappers没有加载过type
       if (hasMapper(type)) {
         throw new BindingException("Type " + type + " is already known to the MapperRegistry.");
       }

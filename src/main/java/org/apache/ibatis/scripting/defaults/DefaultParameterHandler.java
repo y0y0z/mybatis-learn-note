@@ -53,11 +53,19 @@ public class DefaultParameterHandler implements ParameterHandler {
     this.boundSql = boundSql;
   }
 
+  /**
+   * 获取传入的实参对象
+   * @return
+   */
   @Override
   public Object getParameterObject() {
     return parameterObject;
   }
 
+  /**
+   * 替换?占位符
+   * @param ps
+   */
   @Override
   public void setParameters(PreparedStatement ps) {
     ErrorContext.instance().activity("setting parameters").object(mappedStatement.getParameterMap().getId());

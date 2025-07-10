@@ -66,17 +66,21 @@ public final class ResultSetLogger extends BaseJdbcLogger implements InvocationH
       if (Object.class.equals(method.getDeclaringClass())) {
         return method.invoke(this, params);
       }
+      // resultset原方法执行
       Object o = method.invoke(rs, params);
+      // 针对ResultSet.next()方法进行后置处理
       if ("next".equals(method.getName())) {
         if ((Boolean) o) {
           rows++;
           if (isTraceEnabled()) {
             ResultSetMetaData rsmd = rs.getMetaData();
             final int columnCount = rsmd.getColumnCount();
+            // 如果是数据集的第一行数据 会输出表头信息
             if (first) {
               first = false;
               printColumnHeaders(rsmd, columnCount);
             }
+            // 输出当前遍历的这行记录
             printColumnValues(columnCount);
           }
         } else {

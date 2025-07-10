@@ -23,6 +23,7 @@ import org.apache.ibatis.cache.CacheException;
 
 /**
  * @author Clinton Begin
+ * 实现cache接口缓存数据的基本能力
  */
 public class PerpetualCache implements Cache {
 

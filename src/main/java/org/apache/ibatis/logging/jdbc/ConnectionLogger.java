@@ -45,6 +45,7 @@ public final class ConnectionLogger extends BaseJdbcLogger implements Invocation
   public Object invoke(Object proxy, Method method, Object[] params)
       throws Throwable {
     try {
+      // 如果调用的是从Object继承的方法，则直接调用，不做任何拦截
       if (Object.class.equals(method.getDeclaringClass())) {
         return method.invoke(this, params);
       }
@@ -53,6 +54,8 @@ public final class ConnectionLogger extends BaseJdbcLogger implements Invocation
           debug(" Preparing: " + removeExtraWhitespace((String) params[0]), true);
         }
         PreparedStatement stmt = (PreparedStatement) method.invoke(connection, params);
+        // 使用 JDK 动态代理的方式为这个 Connection 对象创建相应的代理对象
+        // 创建PreparedStatement对象之后，用PreparedStatementLogger为其创建代理对象
         stmt = PreparedStatementLogger.newInstance(stmt, statementLog, queryStack);
         return stmt;
       } else if ("createStatement".equals(method.getName())) {

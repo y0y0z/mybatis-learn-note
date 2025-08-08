@@ -30,6 +30,7 @@ import org.apache.ibatis.session.Configuration;
 
 /**
  * @author Clinton Begin
+ * MappedStatement 是SQL 映射语句的完整配置封装，它包含了执行一条 SQL 所需的所有信息。
  */
 public final class MappedStatement {
 

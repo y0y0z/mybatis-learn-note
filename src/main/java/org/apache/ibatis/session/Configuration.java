@@ -97,6 +97,7 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
  * @author Clinton Begin
+ * Configuration 是 MyBatis 的核心配置类，它是整个 MyBatis 框架的配置中心和组件注册表。
  */
 public class Configuration {
 
@@ -130,7 +131,9 @@ public class Configuration {
   protected AutoMappingUnknownColumnBehavior autoMappingUnknownColumnBehavior = AutoMappingUnknownColumnBehavior.NONE;
 
   protected Properties variables = new Properties();
+  // 反射工厂
   protected ReflectorFactory reflectorFactory = new DefaultReflectorFactory();
+  // 对象工厂
   protected ObjectFactory objectFactory = new DefaultObjectFactory();
   protected ObjectWrapperFactory objectWrapperFactory = new DefaultObjectWrapperFactory();
 
@@ -147,8 +150,11 @@ public class Configuration {
   protected Class<?> configurationFactory;
 
   protected final MapperRegistry mapperRegistry = new MapperRegistry(this);
+  // 插件拦截器
   protected final InterceptorChain interceptorChain = new InterceptorChain();
+  // 类处理器注册器
   protected final TypeHandlerRegistry typeHandlerRegistry = new TypeHandlerRegistry(this);
+  // 类型别名注册器
   protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry();
   protected final LanguageDriverRegistry languageRegistry = new LanguageDriverRegistry();
 

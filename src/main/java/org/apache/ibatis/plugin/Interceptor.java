@@ -21,14 +21,25 @@ import java.util.Properties;
  * @author Clinton Begin
  */
 public interface Interceptor {
-
+  /**
+   * 插件实现类中需要实现的拦截逻辑
+   * @param invocation
+   * @return
+   * @throws Throwable
+   */
   Object intercept(Invocation invocation) throws Throwable;
 
+  /**
+   * 该方法中决定是否会触发intercept方法
+   * @param target
+   * @return
+   */
   default Object plugin(Object target) {
     return Plugin.wrap(target, this);
   }
 
   default void setProperties(Properties properties) {
+    // 在整个MyBatis初始化过程中用来初始化该插件的方法
     // NOP
   }
 

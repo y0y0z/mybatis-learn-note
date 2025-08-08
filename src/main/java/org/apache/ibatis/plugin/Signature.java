@@ -32,20 +32,21 @@ import java.lang.annotation.Target;
 public @interface Signature {
   /**
    * Returns the java type.
-   *
+   * 要拦截的类
    * @return the java type
    */
   Class<?> type();
 
   /**
    * Returns the method name.
-   *
+   * 要拦截的方法
    * @return the method name
    */
   String method();
 
   /**
    * Returns java types for method argument.
+   * 要拦截的方法的方法参数
    * @return java types for method argument
    */
   Class<?>[] args();

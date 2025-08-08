@@ -76,6 +76,7 @@ public class SqlSessionManager implements SqlSessionFactory, SqlSession {
   }
 
   public void startManagedSession() {
+    // 调用底层被装饰的SqlSessionFactory创建SqlSession对象，并绑定到localSqlSession字段中
     this.localSqlSession.set(openSession());
   }
 
@@ -347,6 +348,7 @@ public class SqlSessionManager implements SqlSessionFactory, SqlSession {
       final SqlSession sqlSession = SqlSessionManager.this.localSqlSession.get();
       if (sqlSession != null) {
         try {
+          // 当前线程已经绑定了SqlSession，直接使用即可
           return method.invoke(sqlSession, args);
         } catch (Throwable t) {
           throw ExceptionUtil.unwrapThrowable(t);

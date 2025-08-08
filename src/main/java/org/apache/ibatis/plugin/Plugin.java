@@ -30,8 +30,18 @@ import org.apache.ibatis.reflection.ExceptionUtil;
  */
 public class Plugin implements InvocationHandler {
 
+  /**
+   * 要拦截的目标对象
+   */
   private final Object target;
+  /**
+   * 目标方法被拦截后 执行的逻辑在interceptor的intercept方法中
+   */
   private final Interceptor interceptor;
+  /**
+   * 记录了 @Signature 注解中配置的方法信息，也就是代理要拦截的目标方法信息
+   * key: 要拦截的类  value: 要拦截的类被拦截的方法
+   */
   private final Map<Class<?>, Set<Method>> signatureMap;
 
   private Plugin(Object target, Interceptor interceptor, Map<Class<?>, Set<Method>> signatureMap) {
@@ -41,10 +51,14 @@ public class Plugin implements InvocationHandler {
   }
 
   public static Object wrap(Object target, Interceptor interceptor) {
+    // 解析自定义interceptor的@signature注解信息
     Map<Class<?>, Set<Method>> signatureMap = getSignatureMap(interceptor);
     Class<?> type = target.getClass();
+    // 检查当前传入的target对象是否为@Signature注解要拦截的类型，如果是的话，就
+    // 使用JDK动态代理的方式创建代理对象
     Class<?>[] interfaces = getAllInterfaces(type, signatureMap);
     if (interfaces.length > 0) {
+      // 创建JDK动态代理
       return Proxy.newProxyInstance(
           type.getClassLoader(),
           interfaces,
@@ -57,6 +71,7 @@ public class Plugin implements InvocationHandler {
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
     try {
       Set<Method> methods = signatureMap.get(method.getDeclaringClass());
+      // 当前类需要被拦截 并且 当前类需要被拦截的方法中包含当前执行的方法 进行拦截
       if (methods != null && methods.contains(method)) {
         return interceptor.intercept(new Invocation(target, method, args));
       }
